@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stadium Pulse — Living Cognitive Stadium Intelligence System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#09090b',
+                            card: 'rgba(18, 18, 24, 0.75)',
+                            cyan: '#00f0ff',
+                            cyanDim: 'rgba(0, 240, 255, 0.15)',
+                            emerald: '#10b981',
+                            emeraldDim: 'rgba(16, 185, 129, 0.15)',
+                            amber: '#f59e0b',
+                            amberDim: 'rgba(245, 158, 11, 0.15)',
+                            rose: '#f43f5e',
+                            roseDim: 'rgba(244, 63, 94, 0.15)',
+                            border: '#1e1e24'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['DM Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <!-- ECharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-cyber-bg text-zinc-100 font-sans min-h-screen overflow-x-hidden relative selection:bg-cyber-cyan/30 selection:text-white">
+    <!-- Starfield/Neural Network Canvas Background -->
+    <canvas id="neuralCanvas" class="absolute inset-0 z-0 pointer-events-none opacity-40"></canvas>
+
+    <!-- App Wrapper -->
+    <div class="relative z-10 flex flex-col min-h-screen max-w-[1700px] mx-auto p-4 md:p-6 gap-6">
+        
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/5 backdrop-blur-md border border-zinc-800/80 rounded-xl p-4 md:px-6 md:py-4 glow-box">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-cyber-cyanDim border border-cyber-cyan/40 rounded-lg text-cyber-cyan animate-pulse">
+                    <i data-lucide="activity" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-white uppercase">Stadium Pulse</h1>
+                        <span class="text-xs bg-zinc-800 text-zinc-400 font-mono px-2 py-0.5 rounded-full border border-zinc-700">v1.2.6</span>
+                    </div>
+                    <p class="text-xs text-zinc-400 font-mono tracking-wider">LIVING DIGITAL TWIN • FIFA WORLD CUP 2026</p>
+                </div>
+            </div>
+
+            <!-- Active Scenario Info -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs font-mono">
+                    <span class="w-2 h-2 rounded-full bg-cyber-emerald animate-ping"></span>
+                    <span class="text-zinc-400">Simulation:</span>
+                    <span id="activeScenarioLabel" class="text-white font-bold uppercase">Base State</span>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs font-mono">
+                    <i data-lucide="cpu" class="w-4 h-4 text-cyber-cyan"></i>
+                    <span class="text-zinc-400">Brain:</span>
+                    <span class="text-cyber-cyan font-bold">Gemini 2.0 Pro Core</span>
+                </div>
+
+                <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs font-mono">
+                    <i data-lucide="database" class="w-4 h-4 text-zinc-500"></i>
+                    <span class="text-zinc-400">Nodes:</span>
+                    <span class="text-white font-bold">100k+ Active Vectors</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Summary Cards Grid -->
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- KPI 1 -->
+            <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden group hover:border-cyber-cyan/50 transition-colors">
+                <div class="flex justify-between items-center text-zinc-400">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Crowd Density Risk</span>
+                    <i data-lucide="users" class="w-5 h-5 text-cyber-cyan"></i>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpiDensity" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">1.2<span class="text-sm font-normal text-zinc-400">/m²</span></span>
+                    <span id="kpiDensityTrend" class="text-xs px-2 py-0.5 rounded-full font-mono font-semibold bg-cyber-emeraldDim text-cyber-emerald">OPTIMAL</span>
+                </div>
+                <div class="text-[10px] text-zinc-500 font-mono uppercase mt-1">Next 30m: Projected Stable</div>
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-cyan/20 group-hover:bg-cyber-cyan transition-colors"></div>
+            </div>
+            
+            <!-- KPI 2 -->
+            <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden group hover:border-cyber-cyan/50 transition-colors">
+                <div class="flex justify-between items-center text-zinc-400">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Flow Efficiency</span>
+                    <i data-lucide="navigation-2" class="w-5 h-5 text-cyber-cyan"></i>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpiFlow" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">96.4%</span>
+                    <span id="kpiFlowTrend" class="text-xs px-2 py-0.5 rounded-full font-mono font-semibold bg-cyber-emeraldDim text-cyber-emerald">STABLE</span>
+                </div>
+                <div class="text-[10px] text-zinc-500 font-mono uppercase mt-1">Concourses clearing at 4.2m/s</div>
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-cyan/20 group-hover:bg-cyber-cyan transition-colors"></div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden group hover:border-cyber-cyan/50 transition-colors">
+                <div class="flex justify-between items-center text-zinc-400">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Dynamic Energy Load</span>
+                    <i data-lucide="zap" class="w-5 h-5 text-cyber-cyan"></i>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpiEnergy" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">1.8 MW</span>
+                    <span id="kpiEnergyTrend" class="text-xs px-2 py-0.5 rounded-full font-mono font-semibold bg-cyber-cyanDim text-cyber-cyan">-14% SAVINGS</span>
+                </div>
+                <div class="text-[10px] text-zinc-500 font-mono uppercase mt-1">Adaptive HVAC & Escalator sleep</div>
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-cyan/20 group-hover:bg-cyber-cyan transition-colors"></div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden group hover:border-cyber-cyan/50 transition-colors">
+                <div class="flex justify-between items-center text-zinc-400">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Volunteer Dispatch</span>
+                    <i data-lucide="heart" class="w-5 h-5 text-cyber-cyan"></i>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpiVolunteers" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">342 / 450</span>
+                    <span id="kpiVolunteersTrend" class="text-xs px-2 py-0.5 rounded-full font-mono font-semibold bg-zinc-800 text-zinc-400">76% ACTIVE</span>
+                </div>
+                <div class="text-[10px] text-zinc-500 font-mono uppercase mt-1">42 Accessibility routes monitored</div>
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-cyan/20 group-hover:bg-cyber-cyan transition-colors"></div>
+            </div>
+        </section>
+
+        <!-- Main Dashboard Split Content -->
+        <main class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- Left Panel: Cognitive AI Reasoner & Agent Communications (Col 3) -->
+            <div class="xl:col-span-3 flex flex-col gap-6 h-full min-h-[600px]">
+                
+                <!-- Generative AI Digital Twin Storyteller -->
+                <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col flex-1 relative glow-box">
+                    <div class="flex items-center gap-2 mb-3 border-b border-zinc-800 pb-2">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-cyber-cyan"></i>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-white">Cognitive Twin Narrator</h2>
+                    </div>
+                    <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-custom max-h-[350px] md:max-h-none text-sm text-zinc-300 leading-relaxed font-sans" id="storytellerNarrator">
+                        <p class="italic text-zinc-500">Connecting to cognitive neural cores...</p>
+                    </div>
+                </div>
+
+                <!-- Live Agent Negotiation Graph/Logs -->
+                <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col h-[280px]">
+                    <div class="flex justify-between items-center mb-3 border-b border-zinc-800 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="network" class="w-5 h-5 text-cyber-cyan"></i>
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-white">Agent Negotiations</h2>
+                        </div>
+                        <span class="text-[10px] bg-cyber-cyanDim text-cyber-cyan px-2 py-0.5 rounded font-mono uppercase">Negotiating</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto space-y-2 pr-1 font-mono text-[11px] leading-tight scrollbar-custom text-zinc-400" id="agentNegotiationFeed">
+                        <!-- Filled by app.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Panel: SVG Digital Twin & Timeline Slider (Col 6) -->
+            <div class="xl:col-span-6 flex flex-col gap-6 h-full min-h-[600px]">
+                <!-- Digital Twin Main Display -->
+                <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col flex-1 relative overflow-hidden glow-box">
+                    <!-- Overlay Controls on Map -->
+                    <div class="absolute top-4 left-4 z-20 flex flex-col gap-2">
+                        <div class="bg-black/85 backdrop-blur-md border border-zinc-700/80 rounded-lg p-3 text-xs flex flex-col gap-1.5">
+                            <div class="font-bold text-white uppercase border-b border-zinc-800 pb-1 flex items-center gap-1.5">
+                                <i data-lucide="eye" class="w-3.5 h-3.5 text-cyber-cyan"></i>
+                                View Layers
+                            </div>
+                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white mt-1">
+                                <input type="checkbox" id="layerCrowd" checked class="accent-cyber-cyan">
+                                Crowd Heatmap
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
+                                <input type="checkbox" id="layerAccessibility" checked class="accent-cyber-cyan">
+                                Wheelchair Routes
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
+                                <input type="checkbox" id="layerVolunteers" checked class="accent-cyber-cyan">
+                                Volunteers
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
+                                <input type="checkbox" id="layerTransit" checked class="accent-cyber-cyan">
+                                Transit Flow
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Digital Twin SVG Stadium Canvas -->
+                    <div class="flex-1 flex items-center justify-center relative min-h-[300px] md:min-h-[450px]" id="mapContainer">
+                        <!-- SVG map injected here -->
+                    </div>
+
+                    <!-- Timeline Control Box -->
+                    <div class="border-t border-zinc-800/80 pt-4 mt-2 flex flex-col gap-3">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2 text-xs font-mono uppercase text-zinc-400">
+                                <i data-lucide="clock" class="w-4 h-4 text-cyber-cyan"></i>
+                                <span>Predictive Time Horizon</span>
+                            </div>
+                            <div id="timelineLabel" class="text-xs bg-cyber-cyanDim text-cyber-cyan font-mono border border-cyber-cyan/40 px-2 py-0.5 rounded font-bold uppercase">
+                                T+0: REALITY STATE
+                            </div>
+                        </div>
+                        
+                        <!-- Slider Input -->
+                        <div class="flex items-center gap-4 relative">
+                            <span class="text-xs font-mono text-zinc-500">NOW</span>
+                            <div class="flex-1 relative flex items-center">
+                                <input type="range" id="timelineRange" min="0" max="3" value="0" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-cyber-cyan focus:outline-none">
+                            </div>
+                            <span class="text-xs font-mono text-zinc-500">T+30m</span>
+                        </div>
+                        
+                        <!-- Timeline Markers -->
+                        <div class="flex justify-between text-[11px] font-mono text-zinc-500 px-8">
+                            <span class="cursor-pointer hover:text-white timeline-marker active-marker" data-step="0">Reality</span>
+                            <span class="cursor-pointer hover:text-white timeline-marker" data-step="1">T+5m</span>
+                            <span class="cursor-pointer hover:text-white timeline-marker" data-step="2">T+10m</span>
+                            <span class="cursor-pointer hover:text-white timeline-marker" data-step="3">T+30m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Analytical Graphs & Incident Monitor (Col 3) -->
+            <div class="xl:col-span-3 flex flex-col gap-6 h-full min-h-[600px]">
+                <!-- Load Predictor Chart (ECharts) -->
+                <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col h-[280px]">
+                    <div class="flex items-center gap-2 mb-2 border-b border-zinc-800 pb-2">
+                        <i data-lucide="trending-up" class="w-5 h-5 text-cyber-cyan"></i>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-white">Load Predictor (Halftime)</h2>
+                    </div>
+                    <div class="flex-1" id="loadPredictorChart"></div>
+                </div>
+
+                <!-- Emergency evacuations/reunification tracker and active micro-missions -->
+                <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col flex-1">
+                    <div class="flex justify-between items-center mb-3 border-b border-zinc-800 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="shield-alert" class="w-5 h-5 text-cyber-cyan"></i>
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-white">Incident & Response</h2>
+                        </div>
+                        <span id="alertCount" class="text-xs font-mono bg-cyber-emeraldDim text-cyber-emerald border border-cyber-emerald/40 px-2 py-0.5 rounded font-bold uppercase">NO INCIDENTS</span>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-custom max-h-[300px]" id="incidentLogs">
+                        <!-- Dynamic list populated by app.js -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Scenario Control Panel (Dynamic triggers) -->
+        <footer class="bg-white/5 backdrop-blur-md border border-zinc-800/80 rounded-xl p-4 glow-box">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 flex items-center gap-2 font-mono">
+                <i data-lucide="sliders" class="w-4 h-4 text-cyber-cyan"></i>
+                Select Live Cognitive Scenario (FIFA Final Demo)
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <button class="scenario-btn active-btn flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider border transition-all" data-scenario="base">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Base State</span>
+                </button>
+                <button class="scenario-btn flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all" data-scenario="halftime">
+                    <i data-lucide="sandwich" class="w-4 h-4"></i>
+                    <span>Halftime Surge</span>
+                </button>
+                <button class="scenario-btn flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all" data-scenario="rain">
+                    <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+                    <span>Sudden Rain</span>
+                </button>
+                <button class="scenario-btn flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all" data-scenario="transit">
+                    <i data-lucide="train" class="w-4 h-4"></i>
+                    <span>Transit Delay</span>
+                </button>
+                <button class="scenario-btn flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all" data-scenario="medical">
+                    <i data-lucide="ambulance" class="w-4 h-4"></i>
+                    <span>Medical Emergency</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- App Logic Injection -->
+    <script src="app.js"></script>
+</body>
+</html>

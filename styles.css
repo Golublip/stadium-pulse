@@ -1,0 +1,100 @@
+/* STADIUM PULSE — FUTURISTIC DESIGN SYSTEM & GLOWING EFFECTS */
+
+/* Custom Animations */
+@keyframes rainFlow {
+    0% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: 200;
+    }
+}
+
+@keyframes dashFlow {
+    0% {
+        stroke-dashoffset: 160;
+    }
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+.animate-rain {
+    animation: rainFlow 1.5s linear infinite;
+}
+
+.animate-flow {
+    animation: dashFlow 3s linear infinite;
+}
+
+/* Glassmorphic Cyber Cards */
+.bg-cyber-card {
+    background: rgba(10, 10, 14, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-cyber-card:hover {
+    border-color: rgba(0, 240, 255, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(0, 240, 255, 0.05);
+}
+
+/* Glowing Boxes */
+.glow-box {
+    box-shadow: 0 0 15px 0 rgba(0, 240, 255, 0.03);
+    border: 1px solid rgba(0, 240, 255, 0.15) !important;
+}
+
+/* Active Scenario Buttons */
+.active-btn {
+    background: rgba(0, 240, 255, 0.1) !important;
+    border-color: #00f0ff !important;
+    color: #00f0ff !important;
+    box-shadow: 0 0 12px 0 rgba(0, 240, 255, 0.25);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+/* Timeline Slider Styles */
+#timelineRange::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00f0ff;
+    cursor: pointer;
+    box-shadow: 0 0 10px 0 #00f0ff;
+    transition: transform 0.1s;
+}
+
+#timelineRange::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* Scrollbar Customization */
+.scrollbar-custom::-webkit-scrollbar {
+    width: 4px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 240, 255, 0.4);
+}
+
+/* Map Interactive Nodes hover states */
+.cursor-pointer:hover {
+    filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
+}
+
+/* Active timeline marker */
+.active-marker {
+    text-shadow: 0 0 6px rgba(0, 240, 255, 0.6);
+}
