@@ -688,9 +688,23 @@ function getFlowTrendText(flowStr) {
     return 'STABLE';
 }
 
-// Markdown Formatter (Bold parsing)
+// Secure HTML Escaper
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
+// Markdown Formatter (Bold parsing) with XSS Protection
 function formatMarkdown(text) {
-    return text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-extrabold">$1</strong>');
+    const escaped = escapeHTML(text);
+    return escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-extrabold">$1</strong>');
 }
 
 // Colorize Logs for futuristic display
@@ -793,6 +807,12 @@ function initPoints() {
 }
 
 function drawNeuralNetwork() {
+    // Performance Optimization: Halt rendering if tab is hidden/minimized
+    if (document.hidden) {
+        requestAnimationFrame(drawNeuralNetwork);
+        return;
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#09090b';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
