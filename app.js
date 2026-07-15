@@ -7,6 +7,37 @@ lucide.createIcons();
 let currentScenario = 'base';
 let currentTimelineStep = 0; // 0 = Reality, 1 = T+5m, 2 = T+10m, 3 = T+30m
 
+let activeInterventions = {
+    base: false,
+    halftime: false,
+    rain: false,
+    transit: false,
+    medical: false
+};
+
+const interventionsData = {
+    base: {
+        text: "No active mitigation required. Monitoring baseline flow.",
+        action: "Intervention Inactive"
+    },
+    halftime: {
+        text: "Predicted overcrowding at Sector 112. Divert 41% of crowd flow toward West concourse. Deploy 18 volunteers to establish lane dividers.",
+        action: "Deploy Concourse Detours"
+    },
+    rain: {
+        text: "Exposed stands wet. Defer egress escalators E1-E4. Deploy non-slip floor mats on North stairways. Dispatch safety details.",
+        action: "Deploy Slippage Mitigation"
+    },
+    transit: {
+        text: "Metro East platform signal failure. Egress holding active at Gate C. Enable dynamic concession highlights. Dispatch 12 transit volunteers.",
+        action: "Activate Station Egress Hold"
+    },
+    medical: {
+        text: "Section 108 medical emergency. Detouring response via Concourse corridor B and Ramp C. Dispatch 5 volunteers to cordon corridor B.",
+        action: "Activate Paramedic Detour"
+    }
+};
+
 // --- SCENARIO DATA SPECIFICATION ---
 const scenarioData = {
     base: {
@@ -361,7 +392,7 @@ function renderStadiumSVG() {
         </g>
 
         <!-- REROUTING PATHWAY / ACCESSIBILITY VECTORS -->
-        ${state.showAccessibilityRoute ? `
+        ${(state.showAccessibilityRoute && activeInterventions.medical) ? `
         <!-- DETOUR PATH (Dashed blue glowing arrow) -->
         <g>
             <path id="detourPath" d="M 310 293 Q 320 310, 350 310 T 430 310 T 520 280" 
@@ -371,7 +402,7 @@ function renderStadiumSVG() {
         ` : ''}
 
         <!-- Pedestrian Flow Vectors for Halftime / Transit scenario -->
-        ${currentScenario === 'halftime' ? `
+        ${(currentScenario === 'halftime' && activeInterventions.halftime) ? `
         <g>
             <!-- Routing arrows north and south -->
             <path d="M 520 180 Q 480 160, 440 170" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-dasharray="6,6" class="animate-flow" />
@@ -380,7 +411,7 @@ function renderStadiumSVG() {
         </g>
         ` : ''}
 
-        ${currentScenario === 'transit' ? `
+        ${(currentScenario === 'transit' && activeInterventions.transit) ? `
         <g>
             <!-- Transit hold arrows -->
             <path d="M 530 230 Q 560 210, 580 185" fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" stroke-dasharray="6,6" />
@@ -663,6 +694,29 @@ function updateDashboard() {
         `;
         incidentEl.appendChild(item);
     });
+    // Update Intervention Card UI
+    const interventionTextEl = document.getElementById('interventionText');
+    const btnExecuteEl = document.getElementById('btnExecuteIntervention');
+    const btnExecuteTextEl = document.getElementById('btnExecuteText');
+
+    if (currentScenario === 'base') {
+        interventionTextEl.textContent = interventionsData.base.text;
+        btnExecuteEl.disabled = true;
+        btnExecuteEl.className = "w-full bg-zinc-800 border border-zinc-700 text-zinc-500 font-bold uppercase text-[10px] py-2 px-3 rounded-lg cursor-not-allowed transition-all flex items-center justify-center gap-1.5";
+        btnExecuteTextEl.textContent = interventionsData.base.action;
+    } else {
+        interventionTextEl.textContent = interventionsData[currentScenario].text;
+        if (!activeInterventions[currentScenario]) {
+            btnExecuteEl.disabled = false;
+            btnExecuteEl.className = "w-full bg-cyber-cyanDim hover:bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold uppercase text-[10px] py-2 px-3 rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 glow-box";
+            btnExecuteTextEl.textContent = "Execute: " + interventionsData[currentScenario].action;
+        } else {
+            btnExecuteEl.disabled = true;
+            btnExecuteEl.className = "w-full bg-cyber-emeraldDim border border-cyber-emerald text-cyber-emerald font-bold uppercase text-[10px] py-2 px-3 rounded-lg cursor-default transition-all flex items-center justify-center gap-1.5";
+            btnExecuteTextEl.textContent = "Mitigation Active";
+        }
+    }
+
     lucide.createIcons();
 
     // Render Stadium Map
@@ -723,6 +777,27 @@ function colorizeLog(log) {
 }
 
 // --- INTERACTIVE EVENT LISTENERS ---
+// Execute Intervention Button
+const btnExecuteEl = document.getElementById('btnExecuteIntervention');
+if (btnExecuteEl) {
+    btnExecuteEl.addEventListener('click', () => {
+        if (currentScenario !== 'base' && !activeInterventions[currentScenario]) {
+            activeInterventions[currentScenario] = true;
+            
+            // Push system negotiation logs
+            const logMsg = `[System] -> [All Agents]: Operator approved Gemini Core mitigation. Deploying routing vectors...`;
+            scenarioData[currentScenario].negotiations.push(logMsg);
+            
+            // Shift timeline state to T+30m: MITIGATED STATE automatically
+            currentTimelineStep = 3;
+            document.getElementById('timelineRange').value = 3;
+            updateTimelineLabel();
+            
+            updateDashboard();
+        }
+    });
+}
+
 // Scenario Buttons
 document.querySelectorAll('.scenario-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {

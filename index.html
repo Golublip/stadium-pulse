@@ -195,19 +195,19 @@
                                 <i data-lucide="eye" class="w-3.5 h-3.5 text-cyber-cyan"></i>
                                 View Layers
                             </div>
-                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white mt-1">
+                            <label for="layerCrowd" class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white mt-1">
                                 <input type="checkbox" id="layerCrowd" checked class="accent-cyber-cyan">
                                 Crowd Heatmap
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
+                            <label for="layerAccessibility" class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
                                 <input type="checkbox" id="layerAccessibility" checked class="accent-cyber-cyan">
                                 Wheelchair Routes
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
+                            <label for="layerVolunteers" class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
                                 <input type="checkbox" id="layerVolunteers" checked class="accent-cyber-cyan">
                                 Volunteers
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
+                            <label for="layerTransit" class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white">
                                 <input type="checkbox" id="layerTransit" checked class="accent-cyber-cyan">
                                 Transit Flow
                             </label>
@@ -253,29 +253,46 @@
 
             <!-- Right Panel: Analytical Graphs & Incident Monitor (Col 3) -->
             <div class="xl:col-span-3 flex flex-col gap-6 h-full min-h-[600px]">
-                <!-- Load Predictor Chart (ECharts) -->
-                <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col h-[280px]">
-                    <div class="flex items-center gap-2 mb-2 border-b border-zinc-800 pb-2">
-                        <i data-lucide="trending-up" class="w-5 h-5 text-cyber-cyan"></i>
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-white">Load Predictor (Halftime)</h2>
-                    </div>
-                    <div class="flex-1" id="loadPredictorChart"></div>
-                </div>
+                 <!-- Load Predictor Chart (ECharts) -->
+                 <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col h-[220px]">
+                     <div class="flex items-center gap-2 mb-2 border-b border-zinc-800 pb-2">
+                         <i data-lucide="trending-up" class="w-5 h-5 text-cyber-cyan"></i>
+                         <h2 class="text-sm font-bold uppercase tracking-wider text-white">Load Predictor</h2>
+                     </div>
+                     <div class="flex-1" id="loadPredictorChart"></div>
+                 </div>
 
-                <!-- Emergency evacuations/reunification tracker and active micro-missions -->
-                <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col flex-1">
-                    <div class="flex justify-between items-center mb-3 border-b border-zinc-800 pb-2">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="shield-alert" class="w-5 h-5 text-cyber-cyan"></i>
-                            <h2 class="text-sm font-bold uppercase tracking-wider text-white">Incident & Response</h2>
-                        </div>
-                        <span id="alertCount" class="text-xs font-mono bg-cyber-emeraldDim text-cyber-emerald border border-cyber-emerald/40 px-2 py-0.5 rounded font-bold uppercase">NO INCIDENTS</span>
-                    </div>
+                 <!-- Living Cognitive Intervention Console -->
+                 <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col h-[200px] relative overflow-hidden glow-box">
+                     <div class="flex items-center gap-2 mb-3 border-b border-zinc-800 pb-2">
+                         <i data-lucide="brain-circuit" class="w-5 h-5 text-cyber-cyan"></i>
+                         <h2 class="text-sm font-bold uppercase tracking-wider text-white">Cognitive Intervention</h2>
+                     </div>
+                     <div class="flex-1 flex flex-col justify-between">
+                         <p id="interventionText" class="text-xs text-zinc-400 font-mono leading-relaxed">
+                             No active mitigation required. Monitoring baseline flow.
+                         </p>
+                         <button id="btnExecuteIntervention" disabled class="w-full bg-zinc-800 border border-zinc-700 text-zinc-500 font-bold uppercase text-[10px] py-2 px-3 rounded-lg cursor-not-allowed transition-all flex items-center justify-center gap-1.5" aria-label="Execute dynamic AI intervention">
+                             <i data-lucide="play" class="w-4 h-4"></i>
+                             <span id="btnExecuteText">Intervention Inactive</span>
+                         </button>
+                     </div>
+                 </div>
 
-                    <div class="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-custom max-h-[300px]" id="incidentLogs">
-                        <!-- Dynamic list populated by app.js -->
-                    </div>
-                </div>
+                 <!-- Emergency evacuations/reunification tracker and active micro-missions -->
+                 <div class="bg-cyber-card border border-zinc-800 rounded-xl p-4 flex flex-col flex-1">
+                     <div class="flex justify-between items-center mb-3 border-b border-zinc-800 pb-2">
+                         <div class="flex items-center gap-2">
+                             <i data-lucide="shield-alert" class="w-5 h-5 text-cyber-cyan"></i>
+                             <h2 class="text-sm font-bold uppercase tracking-wider text-white">Incident & Response</h2>
+                         </div>
+                         <span id="alertCount" class="text-xs font-mono bg-cyber-emeraldDim text-cyber-emerald border border-cyber-emerald/40 px-2 py-0.5 rounded font-bold uppercase">NO INCIDENTS</span>
+                     </div>
+
+                     <div class="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-custom max-h-[220px]" id="incidentLogs">
+                         <!-- Dynamic list populated by app.js -->
+                     </div>
+                 </div>
             </div>
         </main>
 
