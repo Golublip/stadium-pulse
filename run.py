@@ -4,8 +4,10 @@ import webbrowser
 import threading
 import time
 import sys
+import os
 
-PORT = 8000
+PORT = int(os.environ.get("PORT", 8000))
+IS_CONTAINER = os.environ.get("K_SERVICE") is not None
 DIRECTORY = "."
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -37,8 +39,9 @@ if __name__ == "__main__":
     print("=" * 60)
     print("[STADIUM PULSE] Initializing neural model simulation Twin...")
     
-    # Run browser launcher in separate thread
-    threading.Thread(target=open_browser, daemon=True).start()
+    # Run browser launcher in separate thread if not in container
+    if not IS_CONTAINER:
+        threading.Thread(target=open_browser, daemon=True).start()
     
     # Run HTTP Server
     start_server()

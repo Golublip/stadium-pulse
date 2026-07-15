@@ -463,6 +463,80 @@ function renderChart() {
     chartInstance.setOption(option);
 }
 
+// --- LIVE GEMINI API INTEGRATION ---
+const liveNarrativeCache = {};
+
+// Setup API Key Input logic
+document.addEventListener("DOMContentLoaded", () => {
+    const keyInput = document.getElementById('geminiApiKey');
+    if (keyInput) {
+        // Load cached key
+        const savedKey = localStorage.getItem('gemini_api_key');
+        if (savedKey) {
+            keyInput.value = savedKey;
+        }
+        
+        // Listen for key changes
+        keyInput.addEventListener('input', (e) => {
+            localStorage.setItem('gemini_api_key', e.target.value.trim());
+            // Clear cache when key changes to force refresh
+            for (let k in liveNarrativeCache) delete liveNarrativeCache[k];
+            updateDashboard();
+        });
+    }
+});
+
+async function fetchLiveGeminiNarrative(scenario, step) {
+    const keyInput = document.getElementById('geminiApiKey');
+    const apiKey = keyInput ? keyInput.value.trim() : '';
+    if (!apiKey) return null;
+
+    const cacheKey = `${scenario}_${step}`;
+    if (liveNarrativeCache[cacheKey]) {
+        return liveNarrativeCache[cacheKey];
+    }
+
+    const data = scenarioData[scenario];
+    const timeLabel = ["Reality (T+0)", "T+5m (Imagined Future)", "T+10m (Critical Future)", "T+30m (Mitigated Future)"][step];
+    
+    const prompt = `You are the Cognitive Core Brain of Stadium Pulse running in the stadium operations room.
+Analyze the current stadium telemetry for the scenario "${data.label}" at time horizon "${timeLabel}".
+Current crowd density: ${data.metrics.density[step]}
+Current flow rate: ${data.metrics.flow[step]}
+Active Incidents: ${JSON.stringify(data.incidents)}
+Sub-agent negotiation state: ${JSON.stringify(data.negotiations)}
+
+Generate a highly realistic, futuristic operational summary of 2-3 sentences.
+1. Describe the situation or predicted outcome.
+2. Formulate a direct command for volunteer and emergency agents to resolve or stabilize it.
+Use **bolding** on critical zones or actions. Start with "**[Live Gemini Core]**".`;
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+        
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error?.message || response.statusText);
+        }
+
+        const resData = await response.json();
+        const genText = resData.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+        liveNarrativeCache[cacheKey] = genText.trim();
+        return liveNarrativeCache[cacheKey];
+    } catch (e) {
+        console.error("Gemini API Error:", e);
+        return `**[Live Core Error]** Failed to query Gemini API: ${e.message}`;
+    }
+}
+
 // --- UPDATE UI PANELS ON STATE CHANGE ---
 function updateDashboard() {
     const data = scenarioData[currentScenario];
@@ -498,12 +572,46 @@ function updateDashboard() {
     const narratorEl = document.getElementById('storytellerNarrator');
     narratorEl.innerHTML = '';
     
-    // Render all narrative items up to current timeline step
-    for (let i = 0; i <= currentTimelineStep; i++) {
-        const p = document.createElement('p');
-        p.className = i === currentTimelineStep ? 'text-cyber-cyan font-semibold border-l-2 border-cyber-cyan pl-2 py-1' : 'text-zinc-400';
-        p.innerHTML = formatMarkdown(data.narrator[i]);
-        narratorEl.appendChild(p);
+    const keyInput = document.getElementById('geminiApiKey');
+    const hasKey = keyInput && keyInput.value.trim().length > 0;
+
+    if (!hasKey) {
+        // Render Tip
+        const tip = document.createElement('div');
+        tip.className = 'text-[11px] bg-cyber-cyanDim border border-cyber-cyan/30 text-cyber-cyan rounded p-2 mb-3 font-mono leading-snug';
+        tip.innerHTML = '💡 <strong>LIVE AI MODE AVAILABLE</strong><br>Enter a Google Gemini API Key in the header to run live Generative AI analysis of stadium events!';
+        narratorEl.appendChild(tip);
+
+        // Render all narrative items up to current timeline step
+        for (let i = 0; i <= currentTimelineStep; i++) {
+            const p = document.createElement('p');
+            p.className = i === currentTimelineStep ? 'text-cyber-cyan font-semibold border-l-2 border-cyber-cyan pl-2 py-1' : 'text-zinc-400';
+            p.innerHTML = formatMarkdown(data.narrator[i]);
+            narratorEl.appendChild(p);
+        }
+    } else {
+        // Render Active Status
+        const status = document.createElement('div');
+        status.className = 'text-[11px] bg-cyber-emeraldDim border border-cyber-emerald/30 text-cyber-emerald rounded p-2 mb-3 font-mono leading-snug flex items-center gap-2';
+        status.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-ping"></span><span><strong>LIVE GENERATIVE CORE ACTIVE</strong></span>';
+        narratorEl.appendChild(status);
+
+        for (let i = 0; i <= currentTimelineStep; i++) {
+            const p = document.createElement('p');
+            p.className = i === currentTimelineStep ? 'text-cyber-cyan font-semibold border-l-2 border-cyber-cyan pl-2 py-1' : 'text-zinc-400';
+            
+            const cacheKey = `${currentScenario}_${i}`;
+            if (liveNarrativeCache[cacheKey]) {
+                p.innerHTML = formatMarkdown(liveNarrativeCache[cacheKey]);
+            } else {
+                p.innerHTML = '<em>**[Live Gemini Core]** Thinking...</em>';
+                // Trigger async fetch
+                fetchLiveGeminiNarrative(currentScenario, i).then(text => {
+                    updateDashboard();
+                });
+            }
+            narratorEl.appendChild(p);
+        }
     }
     narratorEl.scrollTop = narratorEl.scrollHeight;
 
